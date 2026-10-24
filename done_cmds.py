@@ -5,13 +5,17 @@ async def task_done(ctx):
     # Emojis that mark a task as completed or canceled/ignored
     done_emojis = {'👍'}
 
-    async for msg in ctx.channel.history(limit=10):
+    async for msg in ctx.channel.history(limit=25):
         # 1. Ignore bots and commands
         if msg.author.bot or msg.content.startswith(ctx.prefix):
             continue
 
         # 2. Skip if the message has a thumbs up OR an X reaction
         if not any(str(reaction.emoji) in done_emojis for reaction in msg.reactions):
+            continue
+
+        # if msg is empty or if msg doesn't start with $
+        if (not msg.content) or (msg.content[0] != '$'):
             continue
 
         # 3. Clean up the message text (replace line breaks with spaces)
@@ -30,4 +34,4 @@ async def task_done(ctx):
         response = "**📋 finished Tasks:**\n" + "\n".join(finished_tasks)
         await ctx.send(response)
     else:
-        await ctx.send("🎉 All tasks in the last 100 messages are complete!")
+        await ctx.send(":( No tasks in the last 100 messages are complete!")

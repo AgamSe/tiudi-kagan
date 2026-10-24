@@ -14,8 +14,12 @@ async def task_status(ctx):
         if any(str(reaction.emoji) in skip_emojis for reaction in msg.reactions):
             continue
 
+        # if msg is empty or if msg doesn't start with $
+        if (not msg.content) or (msg.content[0] != '$'):
+            continue
+
         # 3. Clean up the message text (replace line breaks with spaces)
-        clean_content = msg.content.replace("\n", " ").strip()
+        clean_content = msg.content[1:].replace("\n", " ").strip()
         if not clean_content:
             clean_content = "[Attachment / No text]"
             
