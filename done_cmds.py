@@ -19,11 +19,11 @@ async def task_done(ctx):
             continue
 
         # 3. Clean up the message text (replace line breaks with spaces)
-        clean_content = msg.content.replace("\n", " ").strip()
-        if not clean_content:
-            clean_content = "[Attachment / No text]"
+        first_line = msg.content[1:].split("\n")[0].strip()
+        if not first_line:
+            first_line = "[Attachment / No text]"
             
-        preview = clean_content[:50] + "..." if len(clean_content) > 50 else clean_content
+        preview = first_line[:50] + "..." if len(first_line) > 50 else first_line
 
         # Put the link on static text (or paste msg.jump_url directly) so user text never breaks it
         task_entry = f"• **[Jump to finished task]({msg.jump_url})** — {preview} (Requested by {msg.author.mention})"
