@@ -1,5 +1,7 @@
+from load_students import load_students
 
-async def task_status(ctx):
+
+async def default_status(ctx):
     pending_tasks = []
     
     # Emojis that mark a task as completed or canceled/ignored
@@ -35,3 +37,30 @@ async def task_status(ctx):
         await ctx.send(response)
     else:
         await ctx.send("🎉 All tasks in the last 100 messages are complete!")
+
+async def presentation_status(ctx):
+    students_that_didnt_present = load_students()
+
+    async for msg in ctx.channel.history(limit=500):
+        # 1. Ignore bots and commands
+        if msg.author.bot or msg.content.startswith(ctx.prefix):
+            continue
+
+        # if msg is empty or if msg doesn't start with $
+        if (not msg.content) or (msg.content[0] != '$'):
+            continue
+
+        mentioned_channel_names = [channel.name for channel in msg.channel_mentions]
+
+        # loops over a snapshot of the list 
+        for student in students_that_didnt_present[:]:
+            for mentioned_channel_name in mentioned_channel_names:
+                if student in mentioned_channel_name.replace('-', ' '):
+                    students_that_didnt_present.remove(student)
+
+    if len(students_that_didnt_present) != 0:
+        output = "חניכים שלא הציגו:\n"
+        output += '\n'.join(students_that_didnt_present)
+        await ctx.send(output)
+    else:
+        await ctx.send("🎉 All students have presented!")

@@ -3,6 +3,7 @@ from discord.ext import commands
 from bot_token import BOT_TOKEN
 import status_cmds
 import done_cmds
+from load_students import load_students
 
 # 1. Setup Intents
 intents = discord.Intents.default()
@@ -23,11 +24,25 @@ async def ping(ctx):
 
 @bot.command(name="status")
 async def status(ctx):
-    await status_cmds.task_status(ctx)
+    if ctx.channel.name in ['הרצאות-חניכים-30-דקות👨🏽🏫', 'הרצאות-חניכים-5-דקות']:
+        await status_cmds.presentation_status(ctx)
+    else:
+        await status_cmds.default_status(ctx)
 
 @bot.command(name="done")
 async def done(ctx):
-    await done_cmds.task_done(ctx)
+    if ctx.channel.name in ['הרצאות-חניכים-30-דקות👨🏽🏫', 'הרצאות-חניכים-5-דקות']:
+        await done_cmds.presentation_done(ctx)
+    else:
+        await done_cmds.default_done(ctx)
+
+@bot.command(name="students")
+async def students(ctx):
+
+    students_str = 'כל חניכי הקורס:\n'
+    students_str += '\n'.join(load_students())
+
+    await ctx.send(students_str)
 
 @bot.event
 async def on_message(message):
