@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 from bot_token import BOT_TOKEN
+import status_cmds
+import done_cmds
 
 # 1. Setup Intents
 intents = discord.Intents.default()
@@ -18,6 +20,21 @@ async def on_ready():
 @bot.command()
 async def ping(ctx):
     await ctx.send(f'Pong! Latency: {round(bot.latency * 1000)}ms')
+
+@bot.command(name="status")
+async def status(ctx):
+    # Option A: Check by channel name
+    if ctx.channel.name == "כללי🦉":
+        await ctx.send("🟢 All systems operational. Chat is active.")
+    elif ctx.channel.name in ["הלבנות-✈️🫷🏽👩🏼‍💻🧏🏼‍♀️"]:
+        await status_cmds.task_status(ctx)
+
+@bot.command(name="done")
+async def done(ctx):
+    if ctx.channel.name == "כללי🦉":
+        await ctx.send("🟢 All systems operational. Chat is active.")
+    elif ctx.channel.name in ["הלבנות-✈️🫷🏽👩🏼‍💻🧏🏼‍♀️"]:
+        await done_cmds.task_done(ctx)
 
 @bot.event
 async def on_message(message):
