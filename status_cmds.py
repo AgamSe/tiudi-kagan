@@ -1,7 +1,8 @@
 from load_students import load_students
 import discord
 
-SKIP_EMOJIS = {'👍', '❌', '✖️'}
+SKIP_EMOJIS = {"👍", "❌", "✖️"}
+
 
 async def default_status(ctx):
     pending_tasks = []
@@ -16,14 +17,14 @@ async def default_status(ctx):
             continue
 
         # if msg is empty or if msg doesn't start with $
-        if (not msg.content) or (msg.content[0] != '$'):
+        if (not msg.content) or (msg.content[0] != "$"):
             continue
 
         # 3. Clean up the message text (replace line breaks with spaces)
         first_line = msg.content[1:].split("\n")[0].strip()
         if not first_line:
             first_line = "[Attachment / No text]"
-            
+
         preview = first_line[:50] + "..." if len(first_line) > 50 else first_line
 
         # Put the link on static text (or paste msg.jump_url directly) so user text never breaks it
@@ -37,6 +38,7 @@ async def default_status(ctx):
     else:
         await ctx.send("🎉 All tasks in the last 100 messages are complete!")
 
+
 async def presentation_status(ctx):
     students_that_didnt_present = load_students()
 
@@ -46,32 +48,34 @@ async def presentation_status(ctx):
             continue
 
         # if msg is empty or if msg doesn't start with $
-        if (not msg.content) or (msg.content[0] != '$'):
+        if (not msg.content) or (msg.content[0] != "$"):
             continue
 
         mentioned_channel_names = [channel.name for channel in msg.channel_mentions]
 
-        # loops over a snapshot of the list 
+        # loops over a snapshot of the list
         for student in students_that_didnt_present[:]:
             for mentioned_channel_name in mentioned_channel_names:
-                if student in mentioned_channel_name.replace('-', ' '):
+                if student in mentioned_channel_name.replace("-", " "):
                     students_that_didnt_present.remove(student)
 
     if len(students_that_didnt_present) != 0:
         output = "חניכים שלא הציגו:\n"
-        output += '\n'.join(students_that_didnt_present)
+        output += "\n".join(students_that_didnt_present)
         await ctx.send(output)
     else:
         await ctx.send("🎉 All students have presented!")
 
 
 async def status_all(ctx):
-    
-    status_msg = await ctx.send(f"🔍 Scanning all tasks... (This may take a few seconds)")
+
+    status_msg = await ctx.send(
+        f"🔍 Scanning all tasks... (This may take a few seconds)"
+    )
 
     # List non-task channels here so normal chat isn't flagged as pending tasks
-    ignored_channels = ['הרצאות-חניכים-30-דקות👨🏽🏫', 'הרצאות-חניכים-5-דקות']
-    
+    ignored_channels = ["הרצאות-חניכים-30-דקות👨🏽🏫", "הרצאות-חניכים-5-דקות"]
+
     report_sections = []
 
     # Loop through every text channel in the server
@@ -87,18 +91,22 @@ async def status_all(ctx):
                     continue
 
                 # 2. Skip completed or canceled tasks
-                if any(str(reaction.emoji) in SKIP_EMOJIS for reaction in msg.reactions):
+                if any(
+                    str(reaction.emoji) in SKIP_EMOJIS for reaction in msg.reactions
+                ):
                     continue
 
                 # if msg is empty or if msg doesn't start with $
-                if (not msg.content) or (msg.content[0] != '$'):
+                if (not msg.content) or (msg.content[0] != "$"):
                     continue
 
                 # 3. Clean and format the task preview
                 first_line = msg.content[1:].split("\n")[0].strip()
                 if not first_line:
                     first_line = "[Attachment / No text]"
-                preview = first_line[:50] + "..." if len(first_line) > 50 else first_line
+                preview = (
+                    first_line[:50] + "..." if len(first_line) > 50 else first_line
+                )
 
                 task_entry = f"• **[Jump to Task]({msg.jump_url})** — {preview} ({msg.author.display_name})"
                 channel_tasks.append(task_entry)
